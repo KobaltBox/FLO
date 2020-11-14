@@ -17,10 +17,12 @@ public class PlayerController : MonoBehaviour
 
     //Initial States
     public int startingCapacity;
+    public bool gameover;
 
     public GameObject reticle;
     public GameObject healthMask;
     public GameObject shootingSprite;
+    public SpriteRenderer bordersprite;
 
     //*-----------------------------------------------*
 
@@ -40,11 +42,14 @@ public class PlayerController : MonoBehaviour
     private Vector3 aimLeft;
     private Vector3 aimRight;
     private GameObject playerHealth;
+    private TrailRenderer trail;
+    private SpriteRenderer sprite;
     private SpriteRenderer[] healthSprites;
 
     //Player States
     public int currentCapacity;
     public bool firingCooldown;
+    public Material deatheffect;
     private float firingCooldownTimestamp;
 
     private Vector3[] capacityScale;
@@ -56,6 +61,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         //Player Initialisation
+        gameover = false;
         currentCapacity = startingCapacity;
         capacityScale = new Vector3[]
         {
@@ -74,10 +80,14 @@ public class PlayerController : MonoBehaviour
         //healthMask.transform.localScale = capacityScale[currentCapacity];
         //GameObjects
         playerPhysics = gameObject.GetComponent<Rigidbody2D>();
+        sprite = gameObject.GetComponent<SpriteRenderer>();
+        bordersprite = GameObject.Find("PlayerBorder").GetComponent<SpriteRenderer>();
         mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
         psController = GameObject.Find("PlayerParticleSystemsController");
         playerHealth = GameObject.Find("PlayerHealth");
         healthSprites = playerHealth.GetComponentsInChildren<SpriteRenderer>();
+        trail = gameObject.GetComponent<TrailRenderer>();
+        trail.emitting = false;
 
         //Misc
         aimUp = new Vector3(0.0f, 0.0f, 0.0f);
@@ -90,19 +100,23 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         //Set movement disabled based on dash duration
+        //Also enable emission of trail
         if (movementTimestamp >= Time.time)
         {
             movementDisabled = true;
+            trail.widthMultiplier = capacityScale[currentCapacity].x;
+            trail.emitting = true;
         }
         else
         {
             movementDisabled = false;
+            trail.emitting = false;
         }
 
         //Movement
         offsetSpeedx = xSpeed;
         offsetSpeedy = ySpeed;
-        if (!movementDisabled)
+        if (!movementDisabled && !gameover)
         {
             if (Input.GetKey(KeyCode.W))
             {
@@ -253,8 +267,6 @@ public class PlayerController : MonoBehaviour
                     {
 
                         changeHealth(-1);
-                        mainCamera.GetComponent<CameraShake>().Shake(0.8f);
-                        psController.SendMessage("breakDamageParticleAnimation");
                     }
                     else if (breakHealth <= 0)
                     {
@@ -265,9 +277,13 @@ public class PlayerController : MonoBehaviour
                 break;
             case ChangeType.Add:
                 //Increase current capacity and put fire on cooldown
-                if(currentCapacity<9)
+                if(currentCapacity<startingCapacity)
                 {
                     currentCapacity += capacity;
+                }
+                else
+                {
+                    changeHealth(-1);
                 }
                 //Update sprite mask
                 healthMask.transform.localScale = capacityScale[currentCapacity];
@@ -295,6 +311,8 @@ public class PlayerController : MonoBehaviour
         {
             case ChangeType.Subtract:
                 breakHealth += health;
+                mainCamera.GetComponent<CameraShake>().Shake(0.8f);
+                psController.SendMessage("breakDamageParticleAnimation");
                 break;
             case ChangeType.Add:
                 if (breakHealth < 3)
@@ -318,7 +336,13 @@ public class PlayerController : MonoBehaviour
     }
 
     void GameOver()
-    { }
+    {
+        //Set sprite material to 2d dissolve death shader
+        gameover = true;
+        bordersprite.material = deatheffect;
+        reticle.gameObject.SetActive(false);
+        movementDisabled = true;
+    }
 
         public enum ChangeType : int
     {
