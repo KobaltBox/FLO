@@ -53,4 +53,14 @@ public class ParticleSystemController : MonoBehaviour
         breakDamageSystem.Emit(30);
         
     }
+
+    public void ammoDamageParticleAnimation()
+    {
+        if (!fullCapacitySystem.gameObject.activeSelf)
+        {
+            fullCapacitySystem.gameObject.SetActive(true);
+        }
+        //Player Recieves Break Damage Anim
+        fullCapacitySystem.Emit(10);
+    }
 }

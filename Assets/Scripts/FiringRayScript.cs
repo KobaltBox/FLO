@@ -21,7 +21,6 @@ public class FiringRayScript : MonoBehaviour
     {
         if (collision.tag == "enemy")
         {
-            Debug.Log("Hit an Enemy");
             collision.gameObject.SendMessage("TakeDamage");
         }
     }

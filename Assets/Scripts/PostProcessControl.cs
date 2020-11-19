@@ -26,8 +26,9 @@ public class PostProcessControl : MonoBehaviour
     {
         if (player.gameover)
         {
-            vignette.intensity.value = Mathf.Lerp(vignette.intensity.value, 0.3f, 1 * Time.deltaTime);
+            vignette.intensity.value = Mathf.Lerp(vignette.intensity.value, 0.4f, 1 * Time.deltaTime);
             vignette.smoothness.value = Mathf.Lerp(vignette.smoothness.value, 0.4f, 0.4f * Time.deltaTime);
+
         }
     }
 }

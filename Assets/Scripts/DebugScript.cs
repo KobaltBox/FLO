@@ -31,5 +31,9 @@ public class DebugScript : MonoBehaviour
         fireCooldownText.text = playerController.firingCooldown.ToString();
         dashCooldownText.text = playerController.movementDisabled.ToString();
         breakHealthText.text = playerController.breakHealth.ToString();
+
+
+        //Placeholder game over dialog
+        //show dialog
     }
 }

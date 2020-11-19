@@ -14,6 +14,7 @@ public class AmbientEnemyScript : MonoBehaviour
 
     public float changeCooldown;
     public int enemyHealth;
+    public int scoreValue;
     public float enemySpeed;
     public float boundary_x;
     public float margin_x;
@@ -22,6 +23,8 @@ public class AmbientEnemyScript : MonoBehaviour
     public float colorFadeSpeed;
     public movementType movementType;
     public GameObject ammodrop;
+    public GameObject score_pop_up;
+    public GameObject score_parent;
 
     private Vector2 targetDirection;
     private SpriteRenderer sprite;
@@ -87,6 +90,7 @@ public class AmbientEnemyScript : MonoBehaviour
             Debug.Log("Hit Player");
             
             collision.gameObject.SendMessage("changeCapacity",-1);
+            collision.gameObject.BroadcastMessage("ammoDamageParticleAnimation");
         }
         
     }
@@ -113,6 +117,12 @@ public class AmbientEnemyScript : MonoBehaviour
             ammodrop = Instantiate(ammodrop, gameObject.transform.position, Quaternion.identity);
             ammodrop.transform.SetParent(gameObject.transform.parent);
         }
+        //Converson of world space of enemy to screen space for gui
+        Vector3 position = Camera.main.WorldToScreenPoint(transform.position);
+        score_pop_up = Instantiate(score_pop_up, position, Quaternion.identity);
+        score_pop_up.transform.SetParent(score_parent.transform);
+        score_pop_up.GetComponent<PopupScoreEffect>().setValue(scoreValue);
+
         Destroy(gameObject);
     }
 

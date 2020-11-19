@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     public float dashMagnitude;
     public float firingCooldownDuration;
     public int breakHealth;
+    public float die_fade_time;
 
     //Initial States
     public int startingCapacity;
@@ -22,7 +23,7 @@ public class PlayerController : MonoBehaviour
     public GameObject reticle;
     public GameObject healthMask;
     public GameObject shootingSprite;
-    public SpriteRenderer bordersprite;
+    public GameObject playerBorder;
 
     //*-----------------------------------------------*
 
@@ -44,6 +45,7 @@ public class PlayerController : MonoBehaviour
     private GameObject playerHealth;
     private TrailRenderer trail;
     private SpriteRenderer sprite;
+    private SpriteRenderer borderSprite;
     private SpriteRenderer[] healthSprites;
 
     //Player States
@@ -55,6 +57,7 @@ public class PlayerController : MonoBehaviour
     private Vector3[] capacityScale;
 
     private GameObject mainCamera;
+    private GameObject gameOverPanel;
 
     private GameObject psController;
     // Start is called before the first frame update
@@ -81,11 +84,13 @@ public class PlayerController : MonoBehaviour
         //GameObjects
         playerPhysics = gameObject.GetComponent<Rigidbody2D>();
         sprite = gameObject.GetComponent<SpriteRenderer>();
-        bordersprite = GameObject.Find("PlayerBorder").GetComponent<SpriteRenderer>();
+        borderSprite = GameObject.Find("PlayerBorder").GetComponent<SpriteRenderer>();
         mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+        gameOverPanel = GameObject.Find("GameOverPanel");
         psController = GameObject.Find("PlayerParticleSystemsController");
         playerHealth = GameObject.Find("PlayerHealth");
         healthSprites = playerHealth.GetComponentsInChildren<SpriteRenderer>();
+        borderSprite = playerBorder.GetComponent<SpriteRenderer>();
         trail = gameObject.GetComponent<TrailRenderer>();
         trail.emitting = false;
 
@@ -215,7 +220,7 @@ public class PlayerController : MonoBehaviour
         }
         if (firingCooldown)
         {
-           //TODO: firing cooldown vfx?
+            //TODO: firing cooldown vfx?
         }
         else
         {
@@ -237,84 +242,68 @@ public class PlayerController : MonoBehaviour
 
     void changeCapacity(int capacity)
     {
-        ChangeType type;
-
-        if (capacity > 0)
+        //We should not affect capacity and therefore break health if the game is over
+        if (!gameover)
         {
-             type = ChangeType.Add;
-        }
-        else
-        {
-            type = ChangeType.Subtract;
-        }
-
-        //Switch on type of change to make to capacity
-        switch (type) {
-            case ChangeType.Subtract:
-                //If we have the capacity
-                if (currentCapacity > 0)
-                {
-                    //Reduce capacity
-                    currentCapacity += capacity;
-                    //Update sprite mask
-                    healthMask.transform.localScale = capacityScale[currentCapacity];
-
-                }
-                else
-                {
-                    //Handle 'Break' Damage
-                    if (breakHealth > 0 && (!firingCooldown))
+            //Switch on type of change to make to capacity
+            switch (Mathf.Sign(capacity))
+            {
+                case -1:
+                    //If we have the capacity
+                    if (currentCapacity > 0)
                     {
+                        //Reduce capacity
+                        currentCapacity += capacity;
+                        //Update sprite mask
+                        healthMask.transform.localScale = capacityScale[currentCapacity];
 
+                    }
+                    else
+                    {
+                        //Handle 'Break' Damage
+                        if (breakHealth > 0 && (!firingCooldown))
+                        {
+
+                            changeHealth(-1);
+                        }
+                        else if (breakHealth <= 0)
+                        {
+                            Debug.Log("Game Over");
+                            GameOver();
+                        }
+                    }
+                    break;
+                case 1:
+                    //Increase current capacity and put fire on cooldown
+                    if (currentCapacity < startingCapacity)
+                    {
+                        currentCapacity += capacity;
+                    }
+                    else
+                    {
                         changeHealth(-1);
                     }
-                    else if (breakHealth <= 0)
-                    {
-                        Debug.Log("Game Over");
-                        GameOver();
-                    }
-                }
-                break;
-            case ChangeType.Add:
-                //Increase current capacity and put fire on cooldown
-                if(currentCapacity<startingCapacity)
-                {
-                    currentCapacity += capacity;
-                }
-                else
-                {
-                    changeHealth(-1);
-                }
-                //Update sprite mask
-                healthMask.transform.localScale = capacityScale[currentCapacity];
-                break;
-            default:
-                break;
+                    //Update sprite mask
+                    healthMask.transform.localScale = capacityScale[currentCapacity];
+                    break;
+                default:
+                    break;
+            }
         }
+        
     }
 
     void changeHealth(int health)
     {
-        ChangeType type;
-
-        if (health > 0)
-        {
-            type = ChangeType.Add;
-        }
-        else
-        {
-            type = ChangeType.Subtract;
-        }
-
         //Switch on type of change to make to health
-        switch (type)
+        switch (Mathf.Sign(health))
         {
-            case ChangeType.Subtract:
+            case -1:
                 breakHealth += health;
                 mainCamera.GetComponent<CameraShake>().Shake(0.8f);
                 psController.SendMessage("breakDamageParticleAnimation");
                 break;
-            case ChangeType.Add:
+            case 1:
                 if (breakHealth < 3)
                 {
                     breakHealth += health;
@@ -325,10 +314,10 @@ public class PlayerController : MonoBehaviour
         }
 
         //Update Health UI
-        foreach(SpriteRenderer sprite in healthSprites)
+        foreach (SpriteRenderer sprite in healthSprites)
         {
             var number = int.Parse(sprite.gameObject.name.Substring(sprite.gameObject.name.Length - 1, 1));
-            if(number > breakHealth)
+            if (number > breakHealth)
             {
                 sprite.enabled = false;
             }
@@ -339,14 +328,23 @@ public class PlayerController : MonoBehaviour
     {
         //Set sprite material to 2d dissolve death shader
         gameover = true;
-        bordersprite.material = deatheffect;
+        gameOverPanel.SendMessage("ActivateGameOverPanel");
         reticle.gameObject.SetActive(false);
         movementDisabled = true;
+        StartCoroutine(Die());
     }
 
-        public enum ChangeType : int
+    IEnumerator Die()
     {
-        Add,
-        Subtract
+        //Animate player dissolve material
+        var t = 0f;
+        while (t < 1f)
+        {
+            var dissolve_lerp = Mathf.Lerp(1f, 0f, t);
+            borderSprite.material.SetFloat("_Dissolve", dissolve_lerp);
+            t += Time.deltaTime / die_fade_time;
+            yield return null;
+        }
+        Time.timeScale = Mathf.Lerp(Time.timeScale, 0f, 0.8f * Time.deltaTime);
     }
 }

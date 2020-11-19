@@ -1,0 +1,11 @@
+{
+time:1s
+spawns:[
+{
+position: Spawn1, type:ambient
+},
+{
+position: Spawn2, type:ambient
+}
+]
+}
