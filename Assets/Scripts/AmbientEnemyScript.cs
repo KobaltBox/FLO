@@ -2,13 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum movementType : int
-{
-    Constant,
-    Instant
-}
-
-
 public class AmbientEnemyScript : MonoBehaviour
 {
 
@@ -21,23 +14,41 @@ public class AmbientEnemyScript : MonoBehaviour
     public float boundary_y;
     public float margin_y;
     public float colorFadeSpeed;
-    public movementType movementType;
     public GameObject ammodrop;
     public GameObject score_pop_up;
-    public GameObject score_parent;
 
-    private Vector2 targetDirection;
+    private GameObject player;
+    private GameObject score_parent;
+    private BoxCollider2D collisionvol;
+    private Vector3 targetDirection;
     private SpriteRenderer sprite;
     private float changeTimestamp;
     private Rigidbody2D enemy_rb;
-    private Vector2 targetPosition;
+    private Vector3 targetPosition;
+    private float spawn_time;
+    private float spawn_behaviour_duration;
+    private bool spawning;
     private bool dead;
+
+
+    private void Awake()
+    {
+        //Get time we were instantiated at so we can control initial behaviour
+        spawn_time = Time.time;
+        spawn_behaviour_duration = 0.5f;
+        spawning = true;
+        collisionvol = gameObject.GetComponent<BoxCollider2D>();
+        collisionvol.isTrigger = true;
+    }
+
 
     // Start is called before the first frame update
     void Start()
     {
         enemy_rb = gameObject.GetComponent<Rigidbody2D>();
         sprite = gameObject.GetComponent<SpriteRenderer>();
+        score_parent = GameObject.Find("UI");
+        player = GameObject.Find("PlayerSprite");
 
         float initialx = Random.Range(-1.0f, 1.0f);
         float initialy = Random.Range(-1.0f, 1.0f);
@@ -50,49 +61,63 @@ public class AmbientEnemyScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-        //Pick a new direction
-        if (changeTimestamp <= Time.time)
+        //Are we done being spawned yet?
+        if(Time.time - spawn_time >= spawn_behaviour_duration)
         {
-            //Generate random x and y factors -1.0 - 1.0
-            float randx = Random.Range(-1.0f, 1.0f);
-            float randy = Random.Range(-1.0f, 1.0f);
-
-            targetDirection = new Vector2(randx, randy);
-            changeTimestamp = Time.time + changeCooldown;
-
-            targetPosition = targetDirection * enemySpeed;
+            spawning = false;
         }
-
-
-        if (!dead)
-        {
-            //Move to targetPoint
-            gameObject.GetComponent<Rigidbody2D>().AddForce(targetPosition);
-        }
-        else
+        //Or are we dead?
+        if(dead)
         {
             sprite.color = Vector4.Lerp(new Vector4(sprite.color.r, sprite.color.g, sprite.color.b, 1), new Vector4(1, 1, 1, 1), Time.deltaTime * colorFadeSpeed);
         }
-        
+        //If we are done spawning lets do our normal behaviour
+        if (!spawning)
+        {
+            //Pick a new direction
+            if (changeTimestamp <= Time.time)
+            {
+                //Generate random x and y factors -1.0 - 1.0
+                float randx = Random.Range(-1.0f, 1.0f);
+                float randy = Random.Range(-1.0f, 1.0f);
+
+                targetDirection = new Vector3(randx, randy, 0f);
+                changeTimestamp = Time.time + Random.Range(1.0f, 3.0f);
+
+                targetPosition = Vector3.Normalize(targetDirection);
+            }
+
+            //Move to targetPoint
+            enemy_rb.AddForce(targetPosition * enemySpeed);
+        }
+        //Until then lets do the spawning behaviour
+        else
+        {
+            enemy_rb.AddForce(Vector3.Normalize(player.transform.position - gameObject.transform.position)/4, ForceMode2D.Impulse);
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if(collision.collider.tag == "bounds")
         {
-
             targetPosition = Vector2.Reflect(targetPosition, collision.contacts[0].normal);
-
         }
         if (collision.collider.tag == "Player")
-        {
-            Debug.Log("Hit Player");
-            
+        {   
             collision.gameObject.SendMessage("changeCapacity",-1);
             collision.gameObject.BroadcastMessage("ammoDamageParticleAnimation");
         }
         
+    }
+
+    //Once we exit the bounds object we set trigger flag to false;
+    private void OnTriggerExit2D (Collider2D collision)
+    {
+        if(collision.tag == "bounds")
+        {
+            collisionvol.isTrigger = false;
+        }
     }
 
     public void TakeDamage()

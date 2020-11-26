@@ -29,6 +29,7 @@ public class GameOverPanel : MonoBehaviour
 
         //Initially we want to disable the game over panel and its elements
         gameOverGroup.alpha = 0f;
+        gameOverGroup.blocksRaycasts = false;
         gameOverGroup.interactable = false;
         gameOverPanelMaterial.SetFloat("_Dissolve", 0f);
     }
@@ -61,42 +62,6 @@ public class GameOverPanel : MonoBehaviour
         }
         gameOverPanelMaterial.SetFloat("_Dissolve", end);
         gameOverGroup.interactable = true;
-    }
-
-    public void PlayAgain()
-    {
-        //Reload the scene
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-
-    public void OpenScene(string Scene)
-    {
-        StartCoroutine(Fade("Out",0f));
-        var LoadingCanvas = GameObject.Find("LoadingCanvas");
-        var LoadingCanvasGroup = LoadingCanvas.GetComponent<CanvasGroup>();
-        var loadingvideo = GameObject.Find("LoadingVideo").GetComponent<VideoPlayer>();
-
-        loadingvideo.Stop();
-        loadingvideo.frame = 0;
-        loadingvideo.Play();
-        LoadingCanvasGroup.alpha = 1.0f;
-        StartCoroutine(LoadScene(Scene));
-    }
-
-
-    public IEnumerator LoadScene(String scenename)
-    {
-
-        yield return new WaitForSeconds(4);
-
-        try
-        {
-            AsyncOperation load = SceneManager.LoadSceneAsync(scenename);
-        }
-        catch (Exception e)
-        {
-            Debug.Log(string.Format("An Exception: {0} occured trying to load scene: {0}", e, scenename));
-        }
-
+        gameOverGroup.blocksRaycasts = true;
     }
 }

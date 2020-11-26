@@ -32,11 +32,12 @@ public class PopupScoreEffect : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //TODO Should we invert this if the enemy dies in the top 3rd of the screen?
         text_transform.anchoredPosition = Vector3.Lerp(text_transform.anchoredPosition, targetpoint, 5 * Time.deltaTime);
         text.CrossFadeAlpha(0f, .5f, true);
         if(Time.time - start > delay)
         {
-            //Destroy(gameObject);
+            Destroy(gameObject);
         }
     }
 

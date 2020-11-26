@@ -13,22 +13,55 @@ public class AmmoScript : MonoBehaviour
     private float forceTimeStamp;
     private bool disableForce;
 
+    private SpriteRenderer ammosprite;
+
+    //Track creation time and delay until dissapearance
+    private float startTime;
+    private float deleteDelay;
+    private float flashRate;
+
+    //TODO Need to disable deletion and flash effect if being succd
+
+
     // Start is called before the first frame update
     void Start()
     {
-
-        //TODO: ADD life expectancy to instances of this object.
         rb = gameObject.GetComponent<Rigidbody2D>();
         float randx = Random.Range(-1.0f, 1.0f);
         float randy = Random.Range(-1.0f, 1.0f);
         direction = new Vector2(randx, randy);
         forceTimeStamp = Time.time + forceTime;
         disableForce = false;
+
+        ammosprite = gameObject.GetComponent<SpriteRenderer>();
+
+        startTime = Time.time;
+        deleteDelay = 7f;
+        flashRate = 10f;
+        InvokeRepeating("Flash", 4f, 0.5f * (Time.deltaTime * flashRate));
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Time.time - startTime > deleteDelay)
+        {
+            Destroy(gameObject);
+        }
+
+    }
+
+    void Flash()
+    {
+        if(ammosprite.enabled)
+        {
+            ammosprite.enabled = false;
+        }
+        else
+        {
+            ammosprite.enabled = true;
+        }
+        flashRate *= 0.9f;
     }
 
     private void FixedUpdate()
@@ -55,7 +88,6 @@ public class AmmoScript : MonoBehaviour
     {
         if(collision.gameObject.tag == "collect")
         {
-            Debug.Log("Ammo Got");
             GameObject.FindGameObjectWithTag("Player").SendMessage("changeCapacity", 1);
             Destroy(gameObject);
         }

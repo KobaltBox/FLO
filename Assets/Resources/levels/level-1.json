@@ -1,0 +1,63 @@
+{
+    "levelindex":1,
+    "levelname":"Test Level",
+    "description":"blah blah blah",
+    "increments":
+    [
+        {
+            "time":1.0,
+            "spawns": [
+                {
+                    "position":1,
+                    "type":1,
+                    "quantity":1
+                }
+            ]
+        },
+		{
+            "time":2.0,
+            "spawns": [
+                {
+                    "position":2,
+                    "type":1,
+                    "quantity":1
+                },
+				{
+                    "position":5,
+                    "type":1,
+                    "quantity":1
+                }
+            ]
+        },
+		{
+            "time":5.0,
+            "spawns": [
+                {
+                    "position":1,
+                    "type":1,
+                    "quantity":2
+                },
+				{
+                    "position":2,
+                    "type":1,
+                    "quantity":1
+                },
+				{
+                    "position":2,
+                    "type":-1,
+                    "quantity":1
+                }
+            ]
+        },
+		{
+            "time":1.0,
+            "spawns": [
+                {
+                    "position":1,
+                    "type":1,
+                    "quantity":1
+                }
+            ]
+        }
+    ]
+}
