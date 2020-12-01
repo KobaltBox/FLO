@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
 
     public GameObject reticle;
     public GameObject healthMask;
-    public GameObject shootingSprite;
+    public GameObject projectile;
     public GameObject playerBorder;
 
     //*-----------------------------------------------*
@@ -215,8 +215,6 @@ public class PlayerController : MonoBehaviour
         else
         {
             firingCooldown = false;
-            shootingSprite.GetComponent<SpriteRenderer>().enabled = false;
-            shootingSprite.GetComponent<BoxCollider2D>().enabled = false;
         }
         if (firingCooldown)
         {
@@ -229,9 +227,8 @@ public class PlayerController : MonoBehaviour
                 //Check for ammo
                 if (currentCapacity > 0)
                 {
-                    //Active Collider and sprite
-                    shootingSprite.GetComponent<BoxCollider2D>().enabled = true;
-                    shootingSprite.GetComponent<SpriteRenderer>().enabled = true;
+                    //Instanitate Projectile here
+                    Instantiate(projectile, gameObject.transform.position, reticle.transform.rotation, gameObject.transform);
                 }
                 //We still attempt to take ammo in order to do break damage and put firing on cooldown
                 firingCooldownTimestamp = Time.time + firingCooldownDuration;
