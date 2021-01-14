@@ -20,6 +20,8 @@ public class AmmoScript : MonoBehaviour
     private float deleteDelay;
     private float flashRate;
 
+    public AudioClip clip_collect;
+
     //TODO Need to disable deletion and flash effect if being succd
 
 

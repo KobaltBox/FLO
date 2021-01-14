@@ -30,6 +30,9 @@ public class AmbientEnemyScript : MonoBehaviour
     private bool spawning;
     private bool dead;
 
+    //Audio
+    public AudioClip clip_hit;
+
 
     private void Awake()
     {
@@ -74,6 +77,8 @@ public class AmbientEnemyScript : MonoBehaviour
         //If we are done spawning lets do our normal behaviour
         if (!spawning)
         {
+            //Enable Collision
+            collisionvol.isTrigger = false;
             //Pick a new direction
             if (changeTimestamp <= Time.time)
             {
@@ -104,26 +109,19 @@ public class AmbientEnemyScript : MonoBehaviour
             targetPosition = Vector2.Reflect(targetPosition, collision.contacts[0].normal);
         }
         if (collision.collider.tag == "Player")
-        {   
+        {
+            AudioManager.Instance.PlaySoundAtPoint(clip_hit, gameObject);
             collision.gameObject.SendMessage("changeCapacity",-1);
             collision.gameObject.BroadcastMessage("ammoDamageParticleAnimation");
         }
         
     }
 
-    //Once we exit the bounds object we set trigger flag to false;
-    private void OnTriggerExit2D (Collider2D collision)
-    {
-        if(collision.tag == "bounds")
-        {
-            collisionvol.isTrigger = false;
-        }
-    }
-
     public void TakeDamage()
     {
         enemyHealth--;
-        if(enemyHealth <= 0)
+        AudioManager.Instance.PlaySoundAtPoint(clip_hit, gameObject);
+        if (enemyHealth <= 0)
         {
             StartCoroutine("Die");
        

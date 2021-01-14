@@ -21,8 +21,8 @@ TagManager:
   - PostProcessing
   - Enemy
   - Projectiles
-  - 
-  - 
+  - SpawnLocation
+  - CollectionTrigger
   - 
   - 
   - 

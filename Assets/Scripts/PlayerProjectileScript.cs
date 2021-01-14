@@ -18,6 +18,8 @@ public class PlayerProjectileScript : MonoBehaviour
         rb = gameObject.GetComponent<Rigidbody2D>();
         direction = gameObject.transform.up;
         kill_time = Time.time + kill_delay;
+        rb.AddForce(direction * speed, ForceMode2D.Impulse);
+
     }
 
     private void Update()

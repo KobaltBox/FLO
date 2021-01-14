@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Video;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.Experimental.Rendering.LWRP;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,7 +17,7 @@ public class GameManager : MonoBehaviour
 
     //Enemy Game Objects
     [SerializeField]
-    private GameObject ambientEnemy;
+    private GameObject[] enemytypes;
 
     //Enemy Spawn Parent
     private Transform spawnParent;
@@ -199,17 +200,36 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
-                    for(int i = 0; i < spawn.quantity; ++i)
+                    //Enable Portal Graphics
+                    enablePortal(spawnLocations[spawn.position].gameObject);
+                    yield return new WaitForSeconds(0.5f);
+                    for (int i = 0; i < spawn.quantity; ++i)
                     {
-                        Instantiate(ambientEnemy, position: spawnLocations[spawn.position].position, rotation: Quaternion.identity, parent: spawnParent);
-                        yield return new WaitForSeconds(0.1f);
+                        Instantiate(enemytypes[spawn.type], position: spawnLocations[spawn.position].position, rotation: Quaternion.identity, parent: spawnParent);
+                        yield return new WaitForSeconds(0.3f);
                     }
+                    //Disable Portal Graphics
+                    yield return new WaitForSeconds(0.3f);
+                    disablePortal(spawnLocations[spawn.position].gameObject);
                 }
-                
             }
         }
         yield return new WaitUntil(() => GameObject.FindGameObjectsWithTag("enemy").Length == 0);
         level_over = true;
         yield return true;
+    }
+
+    void enablePortal(GameObject go)
+    {
+        go.GetComponent<ParticleSystemRenderer>().enabled = true;
+        go.GetComponent<Light2D>().enabled = true;
+        go.GetComponent<SpriteRenderer>().enabled = true;
+    }
+
+    void disablePortal(GameObject go)
+    {
+        go.GetComponent<ParticleSystemRenderer>().enabled = false;
+        go.GetComponent<Light2D>().enabled = false;
+        go.GetComponent<SpriteRenderer>().enabled = false;
     }
 }

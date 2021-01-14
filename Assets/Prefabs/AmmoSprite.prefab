@@ -144,3 +144,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   forceTime: 0.2
   forceSize: 0.5
+  player: {fileID: 0}
+  clip_collect: {fileID: 0}

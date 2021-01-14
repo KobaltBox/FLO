@@ -23,6 +23,9 @@ public class MenuSelection : MonoBehaviour, IPointerEnterHandler
     private CanvasGroup LoadingCanvasGroup;
     private VideoPlayer loadingvideo;
 
+    public AudioClip clip_mouseover;
+    public AudioClip clip_click;
+
     private Image selectionRenderer;
     private Transform selectionPosition;
     // Start is called before the first frame update
@@ -53,6 +56,7 @@ public class MenuSelection : MonoBehaviour, IPointerEnterHandler
     public void OnPointerEnter(PointerEventData pointerdata)
     {
         SelectionSprite.transform.position = selectionPosition.transform.position;
+        AudioManager.Instance.PlaySoundAtPoint(clip_mouseover, gameObject);
     }
 
     //Button Click Event Handlers
@@ -64,6 +68,7 @@ public class MenuSelection : MonoBehaviour, IPointerEnterHandler
         loadingvideo.Play();
         LoadingCanvasGroup.alpha = 1.0f;
         StartCoroutine(LoadScene(Scene));
+        AudioManager.Instance.PlaySoundAtPoint(clip_click, gameObject);
     }
 
 

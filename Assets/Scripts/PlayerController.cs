@@ -48,6 +48,13 @@ public class PlayerController : MonoBehaviour
     private SpriteRenderer borderSprite;
     private SpriteRenderer[] healthSprites;
 
+    //Audio
+    public AudioClip clip_fire;
+    public AudioClip clip_dodge;
+    public AudioClip clip_hit;
+    public AudioClip clip_true_damage;
+    public AudioClip clip_collect;
+
     //Player States
     public int currentCapacity;
     public bool firingCooldown;
@@ -180,6 +187,8 @@ public class PlayerController : MonoBehaviour
                 movementTimestamp = Time.time + dashDuration;
                 //Consume ammo
                 changeCapacity(-1);
+                //sfx
+                AudioManager.Instance.PlaySoundAtPoint(clip_dodge, gameObject);
             }
 
         }
@@ -229,6 +238,7 @@ public class PlayerController : MonoBehaviour
                 {
                     //Instanitate Projectile here
                     Instantiate(projectile, gameObject.transform.position, reticle.transform.rotation, gameObject.transform);
+                    AudioManager.Instance.PlaySoundAtPoint(clip_fire, gameObject);
                 }
                 //We still attempt to take ammo in order to do break damage and put firing on cooldown
                 firingCooldownTimestamp = Time.time + firingCooldownDuration;
@@ -275,6 +285,7 @@ public class PlayerController : MonoBehaviour
                     if (currentCapacity < startingCapacity)
                     {
                         currentCapacity += capacity;
+                        AudioManager.Instance.PlaySoundAtPoint(clip_collect, gameObject);
                     }
                     else
                     {
@@ -290,6 +301,21 @@ public class PlayerController : MonoBehaviour
         
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(gameObject.tag != "collect")
+        {
+            if(collision.tag == "enemy")
+            {
+                changeCapacity(-1);
+                psController.SendMessage("ammoDamageParticleAnimation");
+                Debug.Log("Hit by enemy");
+                AudioManager.Instance.PlaySoundAtPoint(clip_hit, gameObject);
+            }
+        }
+    }
+
+
     void changeHealth(int health)
     {
         //Switch on type of change to make to health
@@ -298,6 +324,7 @@ public class PlayerController : MonoBehaviour
             case -1:
                 breakHealth += health;
                 mainCamera.GetComponent<CameraShake>().Shake(0.8f);
+                AudioManager.Instance.PlaySoundAtPoint(clip_true_damage, gameObject);
                 psController.SendMessage("breakDamageParticleAnimation");
                 break;
             case 1:

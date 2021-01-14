@@ -13,12 +13,18 @@ public class CollectionAreaScript : MonoBehaviour
     private float fadeDelta;
     private SpriteRenderer sprite;
     private CircleCollider2D collectionarea;
+    private ParticleSystemRenderer collectPS;
+    private GameObject player;
+    private float timer;
 
     // Start is called before the first frame update
     void Start()
     {
         sprite = gameObject.GetComponent<SpriteRenderer>();
         collectionarea = gameObject.GetComponent<CircleCollider2D>();
+        player = GameObject.Find("PlayerSprite");
+        collectPS = gameObject.GetComponentInChildren<ParticleSystemRenderer>();
+        collectPS.enabled = false;
     }
 
     // Update is called once per frame
@@ -28,15 +34,41 @@ public class CollectionAreaScript : MonoBehaviour
         //Check for collection input
         if(Input.GetKey(KeyCode.CapsLock))
         {
+            timer += Time.deltaTime;
             fadeDelta = Mathf.SmoothDamp(1f, 0f, ref fadeSpeed, fadeTime);
             sprite.color = new Color(1f, 1f, 1f, fadeDelta);
             collectionarea.enabled = true;
+
+            //Mery Mechanic, If player has less than 2 ammo alllow generation of ammo by holding collection for 1 second
+            if(player.GetComponent<PlayerController>().currentCapacity < 2)
+            {
+                collectPS.enabled = true;
+                //Enable ps
+                if(timer >= 1.0f)
+                {
+                    Debug.Log("Mercy Ammo Granted");
+                    player.SendMessage("changeCapacity", 1);
+                    timer = 0f;
+                    //If this increase gets us to 2 ammo disable PS
+                    if(player.GetComponent<PlayerController>().currentCapacity >= 2)
+                    {
+                        collectPS.enabled = false;
+                    }
+                }
+            }
         }
         else
         {
             fadeDelta = Mathf.SmoothDamp(0f, 1f, ref fadeSpeed, fadeTime);
             sprite.color = new Color(1f, 1f, 1f, fadeDelta);
             collectionarea.enabled = false;
+        }
+
+        //On Up key press reset timer and disable ps
+        if(Input.GetKeyUp(KeyCode.CapsLock))
+        {
+            timer = 0f;
+            collectPS.enabled = false;
         }
     }
 
