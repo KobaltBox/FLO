@@ -65,6 +65,7 @@ public class PlayerController : MonoBehaviour
 
     private GameObject mainCamera;
     private GameObject gameOverPanel;
+    private GameObject pauseGamePanel;
 
     private GameObject psController;
     // Start is called before the first frame update
@@ -87,7 +88,7 @@ public class PlayerController : MonoBehaviour
             new Vector3(0.9f, 0.9f, 1.0f),
             new Vector3(1.0f, 1.0f, 1.0f),
         };
-        //healthMask.transform.localScale = capacityScale[currentCapacity];
+        healthMask.transform.localScale = capacityScale[currentCapacity];
         //GameObjects
         playerPhysics = gameObject.GetComponent<Rigidbody2D>();
         sprite = gameObject.GetComponent<SpriteRenderer>();
@@ -96,6 +97,7 @@ public class PlayerController : MonoBehaviour
         gameOverPanel = GameObject.Find("GameOverPanel");
         psController = GameObject.Find("PlayerParticleSystemsController");
         playerHealth = GameObject.Find("PlayerHealth");
+        pauseGamePanel = GameObject.Find("PausePanel");
         healthSprites = playerHealth.GetComponentsInChildren<SpriteRenderer>();
         borderSprite = playerBorder.GetComponent<SpriteRenderer>();
         trail = gameObject.GetComponent<TrailRenderer>();
@@ -106,6 +108,7 @@ public class PlayerController : MonoBehaviour
         aimDown = new Vector3(0.0f, 0.0f, 180.0f);
         aimLeft = new Vector3(0.0f, 0.0f, 90.0f);
         aimRight = new Vector3(0.0f, 0.0f, 270.0f);
+
     }
 
     // Update is called once per frame
@@ -169,6 +172,13 @@ public class PlayerController : MonoBehaviour
                     offsetSpeedx *= diagonalOffset;
                 }
                 playerPhysics.AddForce(new Vector2(1.0f, 0.0f) * offsetSpeedx);
+            }
+
+
+            //Pause Input Logic
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                pauseGamePanel.SendMessage("PauseGameToggle");
             }
 
             horizontalMovement = false;

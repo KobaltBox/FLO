@@ -13,12 +13,10 @@ public class MenuSelection : MonoBehaviour, IPointerEnterHandler
     public GameObject SelectionSprite;
 
     private GameObject MainMenuCanvas;
-    private GameObject AboutCanvas;
     private GameObject HowToPlayCanvas;
     private GameObject LoadingCanvas;
 
     private CanvasGroup MMCanvasGroup;
-    private CanvasGroup AboutCanvasGroup;
     private CanvasGroup HTPCanvasGroup;
     private CanvasGroup LoadingCanvasGroup;
     private VideoPlayer loadingvideo;
@@ -36,13 +34,11 @@ public class MenuSelection : MonoBehaviour, IPointerEnterHandler
 
         MainMenuCanvas = GameObject.Find("MainMenuCanvas");
         HowToPlayCanvas = GameObject.Find("HowtoPlayCanvas");
-        AboutCanvas = GameObject.Find("AboutCanvas");
         LoadingCanvas = GameObject.Find("LoadingCanvas");
         loadingvideo = GameObject.Find("LoadingVideo").GetComponent<VideoPlayer>();
 
         MMCanvasGroup = MainMenuCanvas.GetComponent<CanvasGroup>();
         HTPCanvasGroup = HowToPlayCanvas.GetComponent<CanvasGroup>();
-        AboutCanvasGroup = AboutCanvas.GetComponent<CanvasGroup>();
         LoadingCanvasGroup = LoadingCanvas.GetComponent<CanvasGroup>();
 
     }
@@ -56,7 +52,7 @@ public class MenuSelection : MonoBehaviour, IPointerEnterHandler
     public void OnPointerEnter(PointerEventData pointerdata)
     {
         SelectionSprite.transform.position = selectionPosition.transform.position;
-        AudioManager.Instance.PlaySoundAtPoint(clip_mouseover, gameObject);
+        AudioManager.Instance.PlaySoundClip(clip_mouseover, 0.3f);
     }
 
     //Button Click Event Handlers
@@ -68,7 +64,7 @@ public class MenuSelection : MonoBehaviour, IPointerEnterHandler
         loadingvideo.Play();
         LoadingCanvasGroup.alpha = 1.0f;
         StartCoroutine(LoadScene(Scene));
-        AudioManager.Instance.PlaySoundAtPoint(clip_click, gameObject);
+        AudioManager.Instance.PlaySoundClip(clip_click, 0.3f);
     }
 
 
@@ -88,9 +84,36 @@ public class MenuSelection : MonoBehaviour, IPointerEnterHandler
 
     }
 
-    public void ShowAlternateCanvas()
+    //Toggle MainMenu Canvas and Toggle HTP Canvas
+    public void ToggleHTPCanvas()
     {
-        
+        AudioManager.Instance.PlaySoundClip(clip_mouseover, 0.3f);
+
+        if (MMCanvasGroup.interactable)
+        {
+            MMCanvasGroup.interactable = false;
+            MMCanvasGroup.blocksRaycasts = false;
+            MMCanvasGroup.alpha = 0f;
+
+            HTPCanvasGroup.interactable = true;
+            HTPCanvasGroup.blocksRaycasts = true;
+            HTPCanvasGroup.alpha = 1f;
+        }
+        else
+        {
+            HTPCanvasGroup.interactable = false;
+            HTPCanvasGroup.blocksRaycasts = false;
+            HTPCanvasGroup.alpha = 0f;
+
+            MMCanvasGroup.interactable = true;
+            MMCanvasGroup.blocksRaycasts = true;
+            MMCanvasGroup.alpha = 1f;
+        }
+    }
+
+    public void ToggleAboutCanvas()
+    {
+
     }
 
     public void QuitGame()
