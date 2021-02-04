@@ -15,7 +15,15 @@ public class GameOverPanel : MonoBehaviour
     private GameObject scoreToDisable;
     private CanvasGroup gameOverGroup;
     private Material gameOverPanelMaterial;
-    private Transform[] gameOverPanelElements;
+
+    private Image EnemyPortrait;
+    private Text EnemyTip;
+
+    public Sprite[] enemySprites;
+    public String[] Tips;
+
+    public Sprite KillReportImage = null;
+    public String KillReportTip = null;
 
     private PlayerController player;
 
@@ -23,9 +31,13 @@ public class GameOverPanel : MonoBehaviour
     {
         scoreToDisable = GameObject.Find("Score");
         gameOverPanelMaterial = gameObject.GetComponent<Image>().material;
-        gameOverPanelElements = gameObject.GetComponentsInChildren<Transform>();
+        gameOverPanelMaterial.SetFloat("_Dissolve", 0f);
         gameOverGroup = GameObject.Find("_group").GetComponent<CanvasGroup>();
         player = GameObject.Find("PlayerSprite").GetComponent<PlayerController>();
+
+        //Kill Report
+        EnemyPortrait = GameObject.Find("GO_Enemy_Portrait").GetComponent<Image>();
+        EnemyTip = GameObject.Find("GO_Tip").GetComponent<Text>();
 
         //Initially we want to disable the game over panel and its elements
         gameOverGroup.alpha = 0f;
@@ -40,10 +52,40 @@ public class GameOverPanel : MonoBehaviour
         StartCoroutine(Fade("In", 2f));
     }
 
+    //Set by last enemy collision
+    public void SetCauseofDeath(string enemyname)
+    {
+        if (!player.gameover)
+        {
+            switch (enemyname)
+            {
+                case "ambient":
+                    KillReportImage = enemySprites[0];
+                    KillReportTip = Tips[0];
+                    break;
+                case "charger":
+                    KillReportImage = enemySprites[1];
+                    KillReportTip = Tips[1];
+                    break;
+                case "splitter":
+                    KillReportImage = enemySprites[2];
+                    KillReportTip = Tips[2];
+                    break;
+                case "self":
+                    KillReportImage = enemySprites[3];
+                    KillReportTip = Tips[3];
+                    break;
+            }
+        }
+    }
+
     IEnumerator Fade(string direction, float delay)
     {
         yield return new WaitForSeconds(delay);
         scoreToDisable.SetActive(false);
+
+        EnemyPortrait.sprite = KillReportImage;
+        EnemyTip.text = KillReportTip;
 
         var t = 0f;
 

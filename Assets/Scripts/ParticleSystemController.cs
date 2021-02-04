@@ -29,7 +29,7 @@ public class ParticleSystemController : MonoBehaviour
         //Full Capacity Idle Anim
         if(fullCapacitySystem)
         {
-            if (player.currentCapacity == player.startingCapacity)
+            if (player.currentCapacity == player.maxCapacity)
             {
                 var emission = fullCapacitySystem.emission;
                 emission.enabled = true;

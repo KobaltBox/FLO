@@ -1,0 +1,81 @@
+{
+    "levelname":"Level 1",
+    "increments":
+    [
+        {
+            "time":1.0,
+            "spawns": [
+                {
+                    "position":1,
+                    "type":0,
+                    "quantity":1
+                }
+            ]
+        },
+		{
+            "time":2.0,
+            "spawns": [
+                {
+                    "position":2,
+                    "type":0,
+                    "quantity":1
+                },
+				{
+                    "position":3,
+                    "type":0,
+                    "quantity":1
+                }
+            ]
+        },
+		{
+            "time":5.0,
+            "spawns": [
+                {
+                    "position":1,
+                    "type":1,
+                    "quantity":2
+                },
+				{
+                    "position":2,
+                    "type":1,
+                    "quantity":1
+                },
+				{
+                    "position":2,
+                    "type":-1,
+                    "quantity":1
+                }
+            ]
+        },
+		{
+            "time":1.0,
+            "spawns": [
+                {
+                    "position":0,
+                    "type":1,
+                    "quantity":2
+                }
+            ]
+        },
+		{
+            "time":2.0,
+            "spawns": [
+                {
+                    "position":4,
+                    "type":0,
+                    "quantity":1
+                },
+				{
+                    "position":4,
+                    "type":0,
+                    "quantity":1
+                },
+				{
+                    "position":4,
+                    "type":2,
+                    "quantity":2
+                }
+            ]
+        }
+    ]
+}

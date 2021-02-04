@@ -24,6 +24,7 @@ public class SplitterEnemyScript: MonoBehaviour
     private GameObject h_reticle;
     private GameObject v_beam;
     private GameObject h_beam;
+    private GameOverPanel goPanel;
 
 
     private SpriteRenderer vertical_reticle;
@@ -55,12 +56,6 @@ public class SplitterEnemyScript: MonoBehaviour
         spawn_time = Time.time;
         spawning = true;
 
-        //TODO make this a thing
-        //Setting spawn effect
-        /*        spawnScale = transform.localScale * 0.5f;
-                finalScale = transform.localScale;
-                transform.localScale *= .5f;*/
-
         //Get Reticle Sprites
         v_reticle = transform.Find("SplitterReticle_V").gameObject;
         vertical_reticle = v_reticle.GetComponent<SpriteRenderer>();
@@ -89,6 +84,7 @@ public class SplitterEnemyScript: MonoBehaviour
         sprite = gameObject.GetComponent<SpriteRenderer>();
         score_parent = GameObject.Find("UI");
         player = GameObject.Find("PlayerSprite");
+        goPanel = GameObject.Find("GameOverPanel").GetComponent<GameOverPanel>();
 
         //Initial States
         dead = false;
@@ -173,7 +169,6 @@ public class SplitterEnemyScript: MonoBehaviour
             //Decide what direction we are firing in 0: horizontal 1: vertical
             int direction = Random.Range(0, 2);
             //Telegraph attack direction
-            float blink = 1f;
             //Assign 'reticle' based on the direction
             GameObject reticle = direction == 0 ? h_reticle : v_reticle;
             for(int i=1; i < 15; i++)
@@ -232,6 +227,7 @@ public class SplitterEnemyScript: MonoBehaviour
     {
         if (collision.collider.tag == "Player")
         {
+            goPanel.SetCauseofDeath("splitter");
             collision.gameObject.SendMessage("changeCapacity", -1);
             collision.gameObject.BroadcastMessage("ammoDamageParticleAnimation");
         }

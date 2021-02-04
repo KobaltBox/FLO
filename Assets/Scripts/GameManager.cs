@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
     //Enemy Spawn Parent
     private Transform spawnParent;
     //Enemy Spawn Locations
-    private Transform[] spawnLocations;
+    private List<Transform> spawnLocations = new List<Transform>();
 
     //Score
     private static int game_score;
@@ -40,6 +40,8 @@ public class GameManager : MonoBehaviour
     public float increment_timer;
     //Spawn block flag
     public bool blocked;
+
+    private LevelCompletePanel levelCompletePanel;
 
     [SerializeField] LevelInfo levelinfo;
 
@@ -85,7 +87,20 @@ public class GameManager : MonoBehaviour
         //Set Spawn Parent
         spawnParent = GameObject.Find("Entities").transform;
         //Get Spawn Locations
-        spawnLocations = GameObject.Find("SpawnLocations").GetComponentsInChildren<Transform>();
+        player = GameObject.Find("PlayerSprite");
+        foreach (Transform t in GameObject.Find("SpawnLocations").transform)
+        {
+            print(t.gameObject.name);
+            if(t.gameObject.name == "SpawnLocations")
+            {
+                break;
+            }
+            else
+            {
+                spawnLocations.Add(t);
+            }
+        }
+        levelCompletePanel = GameObject.Find("LevelComplete").GetComponent<LevelCompletePanel>();
         blocked = false;
 
         //UI
@@ -216,6 +231,8 @@ public class GameManager : MonoBehaviour
         }
         yield return new WaitUntil(() => GameObject.FindGameObjectsWithTag("enemy").Length == 0);
         level_over = true;
+        levelCompletePanel.CompleteLevelPanel();
+        player.GetComponent<PlayerController>().gameover = true;
         yield return true;
     }
 

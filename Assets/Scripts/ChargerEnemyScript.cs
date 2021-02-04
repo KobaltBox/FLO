@@ -32,6 +32,7 @@ public class ChargerEnemyScript : MonoBehaviour
     private Vector3 targetPosition;
     private Vector3 desiredPosition;
     private float spawn_time;
+    private GameOverPanel goPanel;
 
     //Audio
     public AudioClip clip_step1;
@@ -75,6 +76,7 @@ public class ChargerEnemyScript : MonoBehaviour
         sprite = gameObject.GetComponent<SpriteRenderer>();
         score_parent = GameObject.Find("UI");
         player = GameObject.Find("PlayerSprite");
+        goPanel = GameObject.Find("GameOverPanel").GetComponent<GameOverPanel>();
 
         //Enable coroutine to periodically charge the player
         StartCoroutine("Charge");
@@ -142,9 +144,11 @@ public class ChargerEnemyScript : MonoBehaviour
         }
         if (collision.collider.tag == "Player")
         {
+            goPanel.SetCauseofDeath("charger");
             collision.gameObject.SendMessage("changeCapacity", -1);
             collision.gameObject.BroadcastMessage("ammoDamageParticleAnimation");
             AudioManager.Instance.PlaySoundAtPoint(clip_hit, gameObject);
+            
         }
 
     }
@@ -180,7 +184,6 @@ public class ChargerEnemyScript : MonoBehaviour
             enemy_rb.AddForce(transform.up * (chargeSpeed * distance), ForceMode2D.Impulse);
             reticleSprite.sprite = reticlespritesarray[0];
             AudioManager.Instance.PlaySoundAtPoint(clip_charge, gameObject);
-            Debug.Log("Charge Complete");
             yield return new WaitForSeconds(chargeDuration);
             charging = false;
             //Set Time for next charge

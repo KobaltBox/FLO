@@ -25,12 +25,9 @@ public class LevelCompletePanel : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    public void CompleteLevelPanel()
     {
-        if(gameManager.level_over)
-        {
-            StartCoroutine("LevelComplete");
-        }
+        StartCoroutine("LevelComplete");
     }
 
     IEnumerator LevelComplete()

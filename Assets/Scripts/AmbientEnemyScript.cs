@@ -29,6 +29,7 @@ public class AmbientEnemyScript : MonoBehaviour
     private float spawn_behaviour_duration;
     private bool spawning;
     private bool dead;
+    private GameOverPanel goPanel;
 
     //Audio
     public AudioClip clip_hit;
@@ -52,6 +53,7 @@ public class AmbientEnemyScript : MonoBehaviour
         sprite = gameObject.GetComponent<SpriteRenderer>();
         score_parent = GameObject.Find("UI");
         player = GameObject.Find("PlayerSprite");
+        goPanel = GameObject.Find("GameOverPanel").GetComponent<GameOverPanel>();
 
         float initialx = Random.Range(-1.0f, 1.0f);
         float initialy = Random.Range(-1.0f, 1.0f);
@@ -110,6 +112,7 @@ public class AmbientEnemyScript : MonoBehaviour
         }
         if (collision.collider.tag == "Player")
         {
+            goPanel.SetCauseofDeath("ambient");
             AudioManager.Instance.PlaySoundAtPoint(clip_hit, gameObject);
             collision.gameObject.SendMessage("changeCapacity",-1);
             collision.gameObject.BroadcastMessage("ammoDamageParticleAnimation");

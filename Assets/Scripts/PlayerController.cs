@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     public float die_fade_time;
 
     //Initial States
+    public int maxCapacity;
     public int startingCapacity;
     public bool gameover;
 
@@ -280,7 +281,7 @@ public class PlayerController : MonoBehaviour
                         //Handle 'Break' Damage
                         if (breakHealth > 0 && (!firingCooldown))
                         {
-
+                            gameOverPanel.GetComponent<GameOverPanel>().SetCauseofDeath("self");
                             changeHealth(-1);
                         }
                         else if (breakHealth <= 0)
@@ -292,7 +293,7 @@ public class PlayerController : MonoBehaviour
                     break;
                 case 1:
                     //Increase current capacity and put fire on cooldown
-                    if (currentCapacity < startingCapacity)
+                    if (currentCapacity < maxCapacity)
                     {
                         currentCapacity += capacity;
                         AudioManager.Instance.PlaySoundAtPoint(clip_collect, gameObject);
@@ -310,7 +311,7 @@ public class PlayerController : MonoBehaviour
         }
         
     }
-
+    //Handle Trigger collion for splitter enemy beam
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(gameObject.tag != "collect")
@@ -318,6 +319,7 @@ public class PlayerController : MonoBehaviour
             if(collision.tag == "enemy")
             {
                 changeCapacity(-1);
+                gameOverPanel.GetComponent<GameOverPanel>().SetCauseofDeath("splitter");
                 psController.SendMessage("ammoDamageParticleAnimation");
                 Debug.Log("Hit by enemy");
                 AudioManager.Instance.PlaySoundAtPoint(clip_hit, gameObject);

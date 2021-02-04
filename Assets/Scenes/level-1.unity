@@ -7102,8 +7102,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: e08acab3e297f2b40b3d0325bfc8698a, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -7133,6 +7133,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dissolve_time: 1
+  enemySprites:
+  - {fileID: 21300000, guid: 9dbe0d006e844ad43bb58c14c7e3231f, type: 3}
+  - {fileID: 21300000, guid: 804ea177b86cd7648b190096f175857b, type: 3}
+  - {fileID: 21300000, guid: 87aff246a481bb148907fbad1582df63, type: 3}
+  - {fileID: 21300000, guid: 5cbc3b6d1366cd442aeb8b0043f5049b, type: 3}
+  Tips:
+  - Try not to let that happen again
+  - Listen for the charge attack cues
+  - Don't get pinned on the wrong side of the beam
+  - Poor resource management...
+  KillReportImage: {fileID: 0}
+  KillReportTip: 
 --- !u!1 &579003946
 GameObject:
   m_ObjectHideFlags: 0
@@ -17428,7 +17440,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 726685855}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 0
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -17487,7 +17499,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: f77ab214ee9f894449fcd0206651e6e0, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 87aff246a481bb148907fbad1582df63, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -32943,9 +32955,9 @@ GameObject:
   - component: {fileID: 1289140164}
   - component: {fileID: 1289140163}
   - component: {fileID: 1289140162}
+  - component: {fileID: 1289140159}
   - component: {fileID: 1289140161}
   - component: {fileID: 1289140160}
-  - component: {fileID: 1289140159}
   m_Layer: 11
   m_Name: 4
   m_TagString: Untagged
@@ -36692,7 +36704,7 @@ ParticleSystem:
     interiorCollisions: 0
   TriggerModule:
     enabled: 1
-    collisionShape0: {fileID: 1289140159}
+    collisionShape0: {fileID: 1664136205}
     collisionShape1: {fileID: 0}
     collisionShape2: {fileID: 0}
     collisionShape3: {fileID: 0}
@@ -38290,6 +38302,7 @@ MonoBehaviour:
   firingCooldownDuration: 0.5
   breakHealth: 3
   die_fade_time: 1
+  maxCapacity: 9
   startingCapacity: 5
   gameover: 0
   reticle: {fileID: 1248285625}
