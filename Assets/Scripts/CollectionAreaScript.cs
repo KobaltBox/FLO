@@ -32,7 +32,7 @@ public class CollectionAreaScript : MonoBehaviour
     {
         //TODO: This should have a slight fade effect...
         //Check for collection input
-        if(Input.GetKey(KeyCode.CapsLock))
+        if(Input.GetMouseButton(1))
         {
             timer += Time.deltaTime;
             fadeDelta = Mathf.SmoothDamp(1f, 0f, ref fadeSpeed, fadeTime);

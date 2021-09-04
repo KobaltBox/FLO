@@ -34,18 +34,16 @@ public class PlayerController : MonoBehaviour
     private float offsetSpeedy;
     private float dashTimestamp;
     private float movementTimestamp;
+    private Vector2 mouseScreenPosition;
+    private Vector2 playerDirection;
+
 
     private bool horizontalMovement;
     private bool verticalMovement;
     public bool movementDisabled;
 
-    private Vector3 aimUp;
-    private Vector3 aimDown;
-    private Vector3 aimLeft;
-    private Vector3 aimRight;
     private GameObject playerHealth;
     private TrailRenderer trail;
-    private SpriteRenderer sprite;
     private SpriteRenderer borderSprite;
     private SpriteRenderer[] healthSprites;
 
@@ -63,6 +61,8 @@ public class PlayerController : MonoBehaviour
     private float firingCooldownTimestamp;
 
     private Vector3[] capacityScale;
+    //Vector between mouse position and this gameobject
+    private Vector3 mousePlayerCharacter;
 
     private GameObject mainCamera;
     private GameObject gameOverPanel;
@@ -92,7 +92,6 @@ public class PlayerController : MonoBehaviour
         healthMask.transform.localScale = capacityScale[currentCapacity];
         //GameObjects
         playerPhysics = gameObject.GetComponent<Rigidbody2D>();
-        sprite = gameObject.GetComponent<SpriteRenderer>();
         borderSprite = GameObject.Find("PlayerBorder").GetComponent<SpriteRenderer>();
         mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
         gameOverPanel = GameObject.Find("GameOverPanel");
@@ -103,12 +102,6 @@ public class PlayerController : MonoBehaviour
         borderSprite = playerBorder.GetComponent<SpriteRenderer>();
         trail = gameObject.GetComponent<TrailRenderer>();
         trail.emitting = false;
-
-        //Misc
-        aimUp = new Vector3(0.0f, 0.0f, 0.0f);
-        aimDown = new Vector3(0.0f, 0.0f, 180.0f);
-        aimLeft = new Vector3(0.0f, 0.0f, 90.0f);
-        aimRight = new Vector3(0.0f, 0.0f, 270.0f);
 
     }
 
@@ -206,23 +199,12 @@ public class PlayerController : MonoBehaviour
 
 
         //Aiming
+        //Season 2: We doing mouse controls now lads...
 
-        if (Input.GetKey(KeyCode.UpArrow))
-        {
-            reticle.transform.eulerAngles = aimUp;
-        }
-        if (Input.GetKey(KeyCode.DownArrow))
-        {
-            reticle.transform.eulerAngles = aimDown;
-        }
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            reticle.transform.eulerAngles = aimLeft;
-        }
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            reticle.transform.eulerAngles = aimRight;
-        }
+        mouseScreenPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        playerDirection = (mouseScreenPosition - (Vector2)transform.position).normalized;
+
+        transform.up = playerDirection;
 
         //Firing
         //Check we have resource and then fire, decrease current capacity by 1 increment
@@ -242,13 +224,13 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetMouseButtonDown(0))
             {
                 //Check for ammo
                 if (currentCapacity > 0)
                 {
                     //Instanitate Projectile here
-                    Instantiate(projectile, gameObject.transform.position, reticle.transform.rotation, gameObject.transform);
+                    GameObject thisProjectile = Instantiate(projectile, gameObject.transform.position, gameObject.transform.rotation, gameObject.transform);
                     AudioManager.Instance.PlaySoundAtPoint(clip_fire, gameObject);
                 }
                 //We still attempt to take ammo in order to do break damage and put firing on cooldown
