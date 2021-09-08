@@ -9,7 +9,6 @@ public class CollectionAreaScript : MonoBehaviour
     public float fadeSpeed;
     public float collectionSpeed;
 
-    private bool area_enabled;
     private float fadeDelta;
     private SpriteRenderer sprite;
     private CircleCollider2D collectionarea;
@@ -32,14 +31,14 @@ public class CollectionAreaScript : MonoBehaviour
     {
         //TODO: This should have a slight fade effect...
         //Check for collection input
-        if(Input.GetKey(KeyCode.CapsLock))
+        if(Input.GetMouseButton(1))
         {
             timer += Time.deltaTime;
             fadeDelta = Mathf.SmoothDamp(1f, 0f, ref fadeSpeed, fadeTime);
             sprite.color = new Color(1f, 1f, 1f, fadeDelta);
             collectionarea.enabled = true;
 
-            //Mery Mechanic, If player has less than 2 ammo alllow generation of ammo by holding collection for 1 second
+            //Mercy Mechanic, If player has less than 2 ammo alllow generation of ammo by holding collection for 1 second
             if(player.GetComponent<PlayerController>().currentCapacity < 2)
             {
                 collectPS.enabled = true;
@@ -55,6 +54,7 @@ public class CollectionAreaScript : MonoBehaviour
                         collectPS.enabled = false;
                     }
                 }
+
             }
         }
         else
@@ -62,6 +62,7 @@ public class CollectionAreaScript : MonoBehaviour
             fadeDelta = Mathf.SmoothDamp(0f, 1f, ref fadeSpeed, fadeTime);
             sprite.color = new Color(1f, 1f, 1f, fadeDelta);
             collectionarea.enabled = false;
+            collectPS.enabled = false;
         }
 
         //On Up key press reset timer and disable ps
