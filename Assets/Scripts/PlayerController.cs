@@ -69,6 +69,7 @@ public class PlayerController : MonoBehaviour
     private GameObject pauseGamePanel;
 
     private GameObject psController;
+    private GameObject entityParent;
     // Start is called before the first frame update
     void Start()
     {
@@ -96,6 +97,7 @@ public class PlayerController : MonoBehaviour
         mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
         gameOverPanel = GameObject.Find("GameOverPanel");
         psController = GameObject.Find("PlayerParticleSystemsController");
+        entityParent = GameObject.Find("Entities");
         playerHealth = GameObject.Find("PlayerHealth");
         pauseGamePanel = GameObject.Find("PausePanel");
         healthSprites = playerHealth.GetComponentsInChildren<SpriteRenderer>();
@@ -189,8 +191,6 @@ public class PlayerController : MonoBehaviour
                 playerPhysics.AddForce(playerPhysics.velocity.normalized * dashMagnitude, ForceMode2D.Impulse);
                 //Lock Movement for duration
                 movementTimestamp = Time.time + dashDuration;
-                //Consume ammo
-                changeCapacity(-1);
                 //sfx
                 AudioManager.Instance.PlaySoundAtPoint(clip_dodge, gameObject);
             }
@@ -230,15 +230,19 @@ public class PlayerController : MonoBehaviour
                 if (currentCapacity > 0)
                 {
                     //Instanitate Projectile here
-                    GameObject thisProjectile = Instantiate(projectile, gameObject.transform.position, gameObject.transform.rotation, gameObject.transform);
+                    GameObject thisProjectile = Instantiate(projectile, gameObject.transform.position, gameObject.transform.rotation, entityParent.transform);
+                    //TODO: Projectile feels wonky need to send it on a vector to mouse position.
                     AudioManager.Instance.PlaySoundAtPoint(clip_fire, gameObject);
+                    firingCooldownTimestamp = Time.time + firingCooldownDuration;
+                    changeCapacity(-1);
                 }
-                //We still attempt to take ammo in order to do break damage and put firing on cooldown
-                firingCooldownTimestamp = Time.time + firingCooldownDuration;
-                changeCapacity(-1);
             }
         }
     }
+
+    //Season 2 
+    // Capacity and Health are now independent concepts, we are no longer punishing the player for collecting too much energy,
+    // and no longer taking away health on attempt to perform an action that requires energy when the reserves are empty.
 
     void changeCapacity(int capacity)
     {
@@ -279,10 +283,6 @@ public class PlayerController : MonoBehaviour
                     {
                         currentCapacity += capacity;
                         AudioManager.Instance.PlaySoundAtPoint(clip_collect, gameObject);
-                    }
-                    else
-                    {
-                        changeHealth(-1);
                     }
                     //Update sprite mask
                     healthMask.transform.localScale = capacityScale[currentCapacity];

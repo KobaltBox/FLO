@@ -40,6 +40,6 @@ Material:
     m_Floats:
     - Vector1_E753EFB0: 0.07
     - Vector1_F68C9F5C: 0.1
-    - _Dissolve: 1
+    - _Dissolve: 0
     m_Colors:
     - _asdas123adasd: {r: 0, g: 6.494118, b: 8, a: 0}
